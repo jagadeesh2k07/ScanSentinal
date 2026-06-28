@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScanSentinel — Document Anomaly Detection</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="nav">
+    <div class="nav-inner">
+      <div class="nav-brand">
+        <div class="nav-logo">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+            <rect x="2" y="2" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M6 7h10M6 11h7M6 15h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="16" cy="14" r="3.5" fill="var(--amber)" stroke="var(--bg)" stroke-width="1"/>
+            <path d="M15 14h2M16 13v2" stroke="var(--bg)" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <span class="nav-name">ScanSentinel</span>
+        <span class="nav-tag">BETA</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#upload-section" class="nav-link active">Scanner</a>
+        <a href="#how-it-works" class="nav-link">How it works</a>
+        <a href="#" class="nav-link">Docs</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow">
+        <span class="pill pill-amber">AI-Powered</span>
+        <span class="hero-eyebrow-text">OCR / ICR Anomaly Detection</span>
+      </div>
+      <h1 class="hero-title">
+        Every document tells<br/>
+        a story. <em>We read between<br/> the lines.</em>
+      </h1>
+      <p class="hero-sub">
+        Upload any scanned or handwritten document. ScanSentinel extracts the text,
+        validates every field, and surfaces suspicious patterns — in seconds.
+      </p>
+      <div class="hero-stats">
+        <div class="stat">
+          <span class="stat-num">6</span>
+          <span class="stat-label">anomaly types detected</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">OCR + ICR</span>
+          <span class="stat-label">printed &amp; handwritten</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+          <span class="stat-num">100%</span>
+          <span class="stat-label">client-side preview</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="scanner-layout" id="upload-section">
+
+    <section class="panel panel-left">
+
+      <div class="panel-header">
+        <h2 class="panel-title">Upload document</h2>
+        <p class="panel-sub">JPG, PNG, or PDF — max 10 MB</p>
+      </div>
+
+      <div class="dropzone" id="dropzone">
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" hidden />
+        <div class="dropzone-icon">
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+            <rect x="8" y="4" width="20" height="28" rx="3" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M24 4v8h8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M20 20v8M17 25l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <p class="dropzone-primary">Drop your document here</p>
+        <p class="dropzone-secondary">or</p>
+        <button class="btn btn-outline" id="browseBtn">Browse files</button>
+        <div class="dropzone-formats">
+          <span class="format-tag">JPG</span>
+          <span class="format-tag">PNG</span>
+          <span class="format-tag">PDF</span>
+        </div>
+      </div>
+
+      <div class="file-card hidden" id="fileCard">
+        <div class="file-card-icon" id="fileCardIcon">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <path d="M4 2h9l4 4v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M13 2v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="file-card-meta">
+          <p class="file-card-name" id="fileName">document.pdf</p>
+          <p class="file-card-size" id="fileSize">2.4 MB</p>
+        </div>
+        <button class="file-card-remove" id="removeFile" title="Remove file">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="docType">Document type</label>
+        <select class="field-select" id="docType">
+          <option value="auto">Auto-detect</option>
+          <option value="invoice">Invoice / Bill</option>
+          <option value="certificate">Certificate / Degree</option>
+          <option value="prescription">Medical Prescription</option>
+          <option value="form">Government Form / ID</option>
+          <option value="answer_sheet">Answer Sheet / Marksheet</option>
+          <option value="general">General Document</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Checks to run</label>
+        <div class="checks-grid">
+          <label class="check-item">
+            <input type="checkbox" checked id="chkMissing" />
+            <span>Missing fields</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" checked id="chkFormat" />
+            <span>Format errors</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" checked id="chkDuplicate" />
+            <span>Duplicate entries</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" checked id="chkRange" />
+            <span>Impossible values</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" checked id="chkTamper" />
+            <span>Tampered text</span>
+          </label>
+          <label class="check-item">
+            <input type="checkbox" id="chkSignature" />
+            <span>Signature check</span>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary btn-full" id="scanBtn" disabled>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M2 5H16M2 9h12M2 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="14" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M13 13h2M14 12v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+        Scan document
+      </button>
+
+      <p class="disclaimer">
+        Documents are processed locally in this demo. No data is sent to any server.
+      </p>
+
+    </section>
+
+    <section class="panel panel-right" id="resultsPanel">
+
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <rect x="10" y="6" width="28" height="38" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
+            <rect x="16" y="12" width="28" height="38" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+            <rect x="22" y="18" width="18" height="4" rx="2" fill="currentColor" opacity="0.15"/>
+            <rect x="22" y="26" width="14" height="4" rx="2" fill="currentColor" opacity="0.15"/>
+            <rect x="22" y="34" width="10" height="4" rx="2" fill="currentColor" opacity="0.15"/>
+            <circle cx="40" cy="40" r="10" fill="var(--surface-bg)" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
+            <path d="M36 40h8M40 36v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+          </svg>
+        </div>
+        <h3 class="empty-title">No document scanned yet</h3>
+        <p class="empty-body">Upload a document and run a scan to see the extracted text, anomaly report, and risk score.</p>
+      </div>
+
+      <div class="loading-state hidden" id="loadingState">
+        <div class="loading-bar-wrap">
+          <div class="loading-bar" id="loadingBar"></div>
+        </div>
+        <div class="loading-steps" id="loadingSteps">
+          <p class="loading-step active" data-step="0">Preprocessing image...</p>
+          <p class="loading-step" data-step="1">Running OCR extraction...</p>
+          <p class="loading-step" data-step="2">Validating fields...</p>
+          <p class="loading-step" data-step="3">Running anomaly detection...</p>
+          <p class="loading-step" data-step="4">Generating risk score...</p>
+        </div>
+      </div>
+
+      <div class="results hidden" id="results">
+
+        <div class="risk-card" id="riskCard">
+          <div class="risk-left">
+            <p class="risk-label">Risk score</p>
+            <p class="risk-score" id="riskScore">—</p>
+            <p class="risk-status" id="riskStatus">—</p>
+          </div>
+          <div class="risk-ring-wrap">
+            <svg class="risk-ring" viewBox="0 0 100 100" width="90" height="90">
+              <circle class="risk-ring-bg" cx="50" cy="50" r="40" />
+              <circle class="risk-ring-fill" cx="50" cy="50" r="40" id="riskRingFill" />
+            </svg>
+            <span class="risk-ring-pct" id="riskRingPct">0%</span>
+          </div>
+        </div>
+
+        <div class="result-section">
+          <div class="result-section-header">
+            <h3 class="result-section-title">Anomalies detected</h3>
+            <span class="badge badge-danger" id="anomalyCount">0</span>
+          </div>
+          <div class="anomaly-list" id="anomalyList">
+          </div>
+        </div>
+
+        <div class="result-section">
+          <div class="result-section-header">
+            <h3 class="result-section-title">Extracted text</h3>
+            <button class="btn-copy" id="copyText" title="Copy extracted text">
+              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+                <rect x="4" y="1" width="9" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/>
+                <path d="M2 4v9a2 2 0 002 2h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+              Copy
+            </button>
+          </div>
+          <pre class="extracted-text" id="extractedText"></pre>
+        </div>
+
+        <div class="action-row">
+          <button class="btn btn-outline" id="downloadReport">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M2 12h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Download report
+          </button>
+          <button class="btn btn-outline" id="rescan">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 8a6 6 0 0110.5-4M14 8a6 6 0 01-10.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+              <path d="M12 4l.5-2.5 2.5.5M4 12l-.5 2.5-2.5-.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Scan again
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+  </main>
+
+  <section class="how-section" id="how-it-works">
+    <div class="how-inner">
+      <p class="section-eyebrow">Process</p>
+      <h2 class="section-title">How ScanSentinel works</h2>
+      <div class="steps-row">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="4" y="4" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10 14l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="step-title">Upload</h3>
+          <p class="step-body">Drop in a scanned image or PDF — printed or handwritten.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect x="4" y="6" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M8 12h12M8 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="step-title">Extract</h3>
+          <p class="step-body">OCR &amp; ICR pulls every character out of the document.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <circle cx="14" cy="14" r="9" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M14 10v5l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="step-title">Validate</h3>
+          <p class="step-body">Rules engine checks formats, ranges, and required fields.</p>
+        </div>
+        <div class="step-arrow">→</div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <path d="M6 22L14 6l8 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 17h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="step-title">Report</h3>
+          <p class="step-body">Get a detailed anomaly list and risk score to act on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>ScanSentinel &copy; 2025 &mdash; Built by <a href="https://github.com/jagadeesh2k07" target="_blank">jagadeesh2k07</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
