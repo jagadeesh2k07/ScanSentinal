@@ -1,53 +1,54 @@
-import { OpenAI } from 'openai';
+const { OpenAI } = require('openai');
 
-// Your API Key remains hidden in cloud configuration environment variables
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
+});
 
-export async function POST(req, res) {
+module.exports = async function handler(req, res) {
+  // 1. Handle CORS Preflight Requests
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
+  // 2. Allow only POST requests
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
   try {
-    const { image, documentType, fileName } = await req.json();
+    const { image, documentType, fileName } = req.body;
 
-    // System prompt giving the model strict instructions on handling blur and layout checks
     const promptInstructions = `
-      You are the ScanSentinel Vision Core Engine. You will analyze images containing text that may be semi-blurred, unfocused, compressed, or dimly lit.
+      You are the ScanSentinel Vision Core Engine. Analyze images containing text that may be semi-blurred, unfocused, or dimly lit.
+      Reconstruct obscured strings by examining layout structures and context.
+      Run verification scans matching the target classification pattern: "${documentType}".
       
-      CRITICAL INSTRUCTIONS:
-      1. Reconstruct obscured and blurred strings by examining layout structures, surrounding tokens, and context.
-      2. Run verification scans matching the target classification pattern: "${documentType}".
-      3. Document-specific audits to conduct:
-         - INVOICES: Check for empty signature lines, missing computational balance tallies, or impossible due dates.
-         - CERTIFICATES/ANSWER SHEETS: Flag academic or percentage scores exceeding absolute boundaries (e.g., >100%).
-         - PRESCRIPTIONS: Identify omissions of absolute units (such as 'mg', 'ml', or 'capsules') from drug names.
-      
-      Return ONLY a JSON payload following this precise schema. Do not output markdown text or wrapped code formatting blocks:
+      Return ONLY a JSON payload matching this precise schema. Do not include markdown formatting:
       {
         "text": "Provide the full clean text recovered from the document layout...",
-        "risk": 65,
-        "docType": "${documentType}",
-        "fileName": "${fileName}",
-        "scannedAt": "${new Date().toLocaleString()}",
+        "risk": 45,
         "anomalies": [
           {
             "type": "Name of Anomaly Identified",
-            "detail": "Detailed explanation outlining why this was flagged and how the blurred context was deciphered.",
+            "detail": "Detailed explanation outlining why this was flagged.",
             "severity": "high" 
           }
         ]
       }
-      
-      Note: severity keys must evaluate exactly to 'high', 'medium', or 'low'. If the layout is completely clean, supply an empty array.
     `;
 
-    // Process using a multimodal vision model
     const aiResponse = await openai.chat.completions.create({
-      model: "gpt-4o-mini", // Blazing fast processing speed with advanced layout vision
+      model: "gpt-4o-mini",
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: promptInstructions },
         {
           role: "user",
           content: [
-            { type: "text", text: `Analyze the following file for potential processing anomalies: ${fileName}` },
+            { type: "text", text: `Analyze the file named ${fileName}.` },
             { type: "image_url", image_url: { url: `data:image/jpeg;base64,${image}` } }
           ]
         }
@@ -55,10 +56,13 @@ export async function POST(req, res) {
     });
 
     const parsedOutput = JSON.parse(aiResponse.choices[0].message.content);
+    
+    // Set headers to allow frontend dashboard interaction
+    res.setHeader('Access-Control-Allow-Origin', '*');
     return res.status(200).json(parsedOutput);
 
-  } catch (serverError) {
-    console.error("Worker Execution Error:", serverError);
-    return res.status(500).json({ error: "Internal processing sequence faulted." });
+  } catch (error) {
+    console.error("Vercel Function Error Details:", error);
+    return res.status(500).json({ error: "Internal processing sequence faulted.", details: error.message });
   }
-}
+};
