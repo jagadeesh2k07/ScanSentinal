@@ -919,3 +919,48 @@ a:hover { text-decoration: underline; }
 }
 
 .hidden { display: none !important; }
+/* Dynamic Anomaly Cards Design Layout */
+.anomaly-card {
+  background: var(--slate-2, #252a3a);
+  border-left: 4px solid #64748b;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.anomaly-card h4 {
+  color: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.anomaly-card p {
+  color: #94a3b8;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+/* Severity Indicator System */
+.anomaly-card.severity-high {
+  border-left-color: #ef4444; /* Red */
+}
+.anomaly-card.severity-medium {
+  border-left-color: #f59e0b; /* Orange */
+}
+.anomaly-card.severity-low {
+  border-left-color: #3b82f6; /* Blue */
+}
+
+/* Badges Layout */
+.badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  font-weight: bold;
+}
