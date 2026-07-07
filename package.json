@@ -1,0 +1,25 @@
+{
+  "name": "scansentinel",
+  "version": "1.0.0",
+  "description": "ScanSentinel — An AI-powered document anomaly detection system that uses OCR/ICR to extract text from scanned or handwritten documents and automatically flags suspicious patterns like invalid formats, missing fields, duplicate entries, and impossible values, generating a risk score report.",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jagadeesh2k07/ScanSentinal.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/jagadeesh2k07/ScanSentinal/issues"
+  },
+  "homepage": "https://github.com/jagadeesh2k07/ScanSentinal#readme",
+  "dependencies": {
+    "@google/genai": "^2.10.0",
+    "dotenv": "^17.4.2"
+  }
+}
