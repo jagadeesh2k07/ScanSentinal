@@ -1,329 +1,501 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ScanSentinel — Document Anomaly Detection</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ScanSentinel — AI Document Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-  <header class="nav">
-    <div class="nav-inner">
-      <div class="nav-brand">
-        <div class="nav-logo">
-          <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-            <rect x="2" y="2" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M6 7h10M6 11h7M6 15h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="16" cy="14" r="3.5" fill="var(--amber)" stroke="var(--bg)" stroke-width="1"/>
-            <path d="M15 14h2M16 13v2" stroke="var(--bg)" stroke-width="1" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <span class="nav-name">ScanSentinel</span>
-        <span class="nav-tag">BETA</span>
+<canvas id="ambientCanvas"></canvas>
+
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="nav-brand" href="#">
+      <div class="brand-icon">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M2 3h10l3 3v9a1 1 0 01-1 1H2a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M12 3v3h3" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          <path d="M4 8h6M4 11h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          <circle cx="13" cy="13" r="3.5" fill="var(--bg)" stroke="var(--cyan)" stroke-width="1.1"/>
+          <path d="M12 13h2M13 12v2" stroke="var(--cyan)" stroke-width="0.9" stroke-linecap="round"/>
+        </svg>
       </div>
-      <nav class="nav-links">
-        <a href="#upload-section" class="nav-link active">Scanner</a>
-        <a href="#how-it-works" class="nav-link">How it works</a>
-        <a href="#" class="nav-link">Docs</a>
-      </nav>
+      <span class="brand-name">ScanSentinel</span>
+      <span class="brand-ver">v2.0</span>
+    </a>
+    <div class="nav-center">
+      <a href="#scanner" class="nav-link">Scanner</a>
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#how" class="nav-link">How it works</a>
     </div>
-  </header>
-
-  <section class="hero">
-    <div class="hero-inner">
-      <div class="hero-eyebrow">
-        <span class="pill pill-amber">AI-Powered</span>
-        <span class="hero-eyebrow-text">OCR / ICR Anomaly Detection</span>
+    <div class="nav-right">
+      <div class="nav-status">
+        <span class="status-orb"></span>
+        <span>AI online</span>
       </div>
-      <h1 class="hero-title">
-        Every document tells<br/>
-        a story. <em>We read between<br/> the lines.</em>
-      </h1>
-      <p class="hero-sub">
-        Upload any scanned or handwritten document. ScanSentinel extracts the text,
-        validates every field, and surfaces suspicious patterns — in seconds.
-      </p>
-      <div class="hero-stats">
-        <div class="stat">
-          <span class="stat-num">6</span>
-          <span class="stat-label">anomaly types detected</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-num">OCR + ICR</span>
-          <span class="stat-label">printed &amp; handwritten</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat">
-          <span class="stat-num">100%</span>
-          <span class="stat-label">client-side preview</span>
-        </div>
-      </div>
+      <a href="https://github.com/jagadeesh2k07" target="_blank" class="nav-gh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+        GitHub
+      </a>
     </div>
-  </section>
+  </div>
+</nav>
 
-  <main class="scanner-layout" id="upload-section">
+<section class="hero" id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-glow hero-glow-1"></div>
+  <div class="hero-glow hero-glow-2"></div>
 
-    <section class="panel panel-left">
+  <div class="hero-content">
+    <div class="hero-eyebrow" data-aos>
+      <span class="eyebrow-dot"></span>
+      OCR · ICR · BLUR DETECTION · ANOMALY AI
+    </div>
+    <h1 class="hero-h1" data-aos data-aos-delay="100">
+      Your documents<br/>
+      <span class="h1-accent">can't hide anymore.</span>
+    </h1>
+    <p class="hero-p" data-aos data-aos-delay="200">
+      ScanSentinel reads between the pixels. Upload any document — printed, handwritten, blurred, or damaged — and get an AI-powered anomaly report with a risk score in seconds.
+    </p>
+    <div class="hero-actions" data-aos data-aos-delay="300">
+      <a href="#scanner" class="btn-hero-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="2" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M4 6h8M4 9h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="12" cy="10" r="3" fill="var(--bg)" stroke="var(--cyan)" stroke-width="1.2"/><path d="M11 10h2M12 9v2" stroke="var(--cyan)" stroke-width="0.9" stroke-linecap="round"/></svg>
+        Scan a document
+      </a>
+      <a href="#features" class="btn-hero-ghost">Explore features →</a>
+    </div>
+    <div class="hero-trust" data-aos data-aos-delay="400">
+      <span class="trust-item"><span class="trust-check">✓</span> Blur detection</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item"><span class="trust-check">✓</span> AI extraction</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item"><span class="trust-check">✓</span> Risk scoring</span>
+      <span class="trust-sep">·</span>
+      <span class="trust-item"><span class="trust-check">✓</span> Instant report</span>
+    </div>
+  </div>
 
-      <div class="panel-header">
-        <h2 class="panel-title">Upload document</h2>
-        <p class="panel-sub">JPG, PNG, or PDF — max 10 MB</p>
+  <div class="hero-visual" data-aos data-aos-delay="150">
+    <div class="doc-chamber">
+      <div class="chamber-ring ring-1"></div>
+      <div class="chamber-ring ring-2"></div>
+      <div class="chamber-ring ring-3"></div>
+      <div class="doc-card">
+        <div class="doc-header">
+          <div class="doc-dots"><span></span><span></span><span></span></div>
+          <span class="doc-filename">invoice_scan.pdf</span>
+        </div>
+        <div class="doc-lines">
+          <div class="doc-line" style="width:85%"></div>
+          <div class="doc-line" style="width:60%"></div>
+          <div class="doc-line anomaly-line">
+            <span class="anomaly-chip high">⛔ Invalid date</span>
+          </div>
+          <div class="doc-line" style="width:70%"></div>
+          <div class="doc-line anomaly-line">
+            <span class="anomaly-chip medium">⚠ Duplicate ID</span>
+          </div>
+          <div class="doc-line" style="width:50%"></div>
+          <div class="doc-line" style="width:80%"></div>
+        </div>
+        <div class="doc-risk-bar">
+          <span>Risk</span>
+          <div class="drb-track"><div class="drb-fill" style="width:74%"></div></div>
+          <span class="drb-pct">74%</span>
+        </div>
       </div>
+      <div class="chamber-scan-line"></div>
+    </div>
+  </div>
+</section>
 
-      <div class="dropzone" id="dropzone">
-        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" hidden />
-        <div class="dropzone-icon">
-          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-            <rect x="8" y="4" width="20" height="28" rx="3" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M24 4v8h8" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M20 20v8M17 25l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+<section class="features-section" id="features">
+  <div class="features-inner">
+    <div class="feat-card" data-aos>
+      <div class="feat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/><path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Smart OCR + ICR</h3>
+      <p>Extracts printed and handwritten text with high accuracy. Even messy handwriting is analysed.</p>
+    </div>
+    <div class="feat-card" data-aos data-aos-delay="80">
+      <div class="feat-icon blur-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5C7 5 3 9 3 12s4 7 9 7 9-3 9-7-4-7-9-7z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M12 2v2M12 20v2M2 12H4M20 12h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" opacity="0.4"/></svg>
+      </div>
+      <h3>Blur Detection</h3>
+      <p>Measures image sharpness using Laplacian variance. Warns when blur exceeds extraction limits.</p>
+    </div>
+    <div class="feat-card" data-aos data-aos-delay="160">
+      <div class="feat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 3L4 20h16L12 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M12 10v5M12 18v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Anomaly Detection</h3>
+      <p>6 anomaly types: missing fields, format errors, impossible values, duplicates, tampering, and more.</p>
+    </div>
+    <div class="feat-card" data-aos data-aos-delay="240">
+      <div class="feat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M8 12h8M8 8h5M8 16h3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Risk Score Report</h3>
+      <p>Every scan generates a downloadable report with risk score, anomaly breakdown, and raw OCR text.</p>
+    </div>
+    <div class="feat-card" data-aos data-aos-delay="320">
+      <div class="feat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>AI Interpretation</h3>
+      <p>Claude AI reads the extracted text and gives a plain-English summary of what the document says and flags.</p>
+    </div>
+    <div class="feat-card" data-aos data-aos-delay="400">
+      <div class="feat-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 15V3M7 10l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 17v2a2 2 0 002 2h14a2 2 0 002-2v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Export & Share</h3>
+      <p>Download a full .txt report. Copy extracted text. Share anomaly findings instantly.</p>
+    </div>
+  </div>
+</section>
+
+<section class="scanner-wrap" id="scanner">
+  <div class="scanner-header" data-aos>
+    <p class="s-eyebrow">Document Scanner</p>
+    <h2 class="s-title">Drop it. Scan it. Know it.</h2>
+    <p class="s-sub">Supports JPG, PNG, and PDF. Max 10 MB. Blur detection runs automatically on images.</p>
+  </div>
+
+  <div class="scanner-body">
+
+    <div class="col-left">
+
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept=".jpg,.jpeg,.png,.pdf" hidden/>
+
+        <div class="uz-idle" id="uzIdle">
+          <div class="uz-icon-wrap">
+            <div class="uz-ring uz-ring-1"></div>
+            <div class="uz-ring uz-ring-2"></div>
+            <div class="uz-icon-inner">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                <path d="M4 6h18l6 6v16a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M22 6v6h6" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+                <path d="M16 16v8M13 21l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <p class="uz-title">Drop your document here</p>
+          <p class="uz-sub">or click to browse</p>
+          <div class="uz-types">
+            <span>JPG</span><span>PNG</span><span>PDF</span>
+          </div>
+          <p class="uz-limit">Max 10 MB · Blur detection on images</p>
         </div>
-        <p class="dropzone-primary">Drop your document here</p>
-        <p class="dropzone-secondary">or</p>
-        <button class="btn btn-outline" id="browseBtn">Browse files</button>
-        <div class="dropzone-formats">
-          <span class="format-tag">JPG</span>
-          <span class="format-tag">PNG</span>
-          <span class="format-tag">PDF</span>
+
+        <div class="uz-dragover hidden" id="uzDragover">
+          <div class="drag-pulse"></div>
+          <p>Release to upload</p>
         </div>
+
+        <div class="uz-beam hidden" id="uzBeam"></div>
+
+        <canvas class="uz-preview hidden" id="uzPreview"></canvas>
       </div>
 
       <div class="file-card hidden" id="fileCard">
-        <div class="file-card-icon" id="fileCardIcon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M4 2h9l4 4v12a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M13 2v4h4" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-          </svg>
+        <div class="fc-icon" id="fcIcon"></div>
+        <div class="fc-info">
+          <p class="fc-name" id="fcName">—</p>
+          <p class="fc-meta" id="fcMeta">—</p>
         </div>
-        <div class="file-card-meta">
-          <p class="file-card-name" id="fileName">document.pdf</p>
-          <p class="file-card-size" id="fileSize">2.4 MB</p>
+        <div class="fc-blur-badge hidden" id="fcBlurBadge">
+          <span id="fcBlurLabel">—</span>
         </div>
-        <button class="file-card-remove" id="removeFile" title="Remove file">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
+        <button class="fc-remove" id="fcRemove">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M2 2l9 9M11 2l-9 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         </button>
       </div>
 
-      <div class="field-group">
-        <label class="field-label" for="docType">Document type</label>
-        <select class="field-select" id="docType">
-          <option value="auto">Auto-detect</option>
-          <option value="invoice">Invoice / Bill</option>
-          <option value="certificate">Certificate / Degree</option>
-          <option value="prescription">Medical Prescription</option>
-          <option value="form">Government Form / ID</option>
-          <option value="answer_sheet">Answer Sheet / Marksheet</option>
-          <option value="general">General Document</option>
-        </select>
+      <div class="blur-warning hidden" id="blurWarning">
+        <div class="bw-icon">⚠</div>
+        <div class="bw-body">
+          <p class="bw-title" id="bwTitle">Blur detected</p>
+          <p class="bw-sub" id="bwSub">Extraction quality may be reduced.</p>
+        </div>
+        <div class="bw-meter">
+          <div class="bw-track"><div class="bw-fill" id="bwFill"></div></div>
+          <span class="bw-pct" id="bwPct">0%</span>
+        </div>
       </div>
 
-      <div class="field-group">
-        <label class="field-label">Checks to run</label>
-        <div class="checks-grid">
-          <label class="check-item">
-            <input type="checkbox" checked id="chkMissing" />
-            <span>Missing fields</span>
+      <div class="ctrl-group">
+        <label class="ctrl-label">Document type</label>
+        <div class="select-wrap">
+          <select id="docType" class="ctrl-select">
+            <option value="auto">Auto-detect</option>
+            <option value="invoice">Invoice / Bill</option>
+            <option value="certificate">Certificate / Degree</option>
+            <option value="prescription">Medical Prescription</option>
+            <option value="form">Government Form / ID</option>
+            <option value="answer_sheet">Answer Sheet / Marksheet</option>
+            <option value="general">General Document</option>
+          </select>
+          <svg class="sel-arrow" width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 4l3.5 3.5L9 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="ctrl-group">
+        <label class="ctrl-label">Detection modules</label>
+        <div class="modules-grid">
+          <label class="module-toggle">
+            <input type="checkbox" checked id="chkMissing"/>
+            <span class="mt-box">
+              <span class="mt-icon">📋</span>
+              <span class="mt-label">Missing fields</span>
+            </span>
           </label>
-          <label class="check-item">
-            <input type="checkbox" checked id="chkFormat" />
-            <span>Format errors</span>
+          <label class="module-toggle">
+            <input type="checkbox" checked id="chkFormat"/>
+            <span class="mt-box">
+              <span class="mt-icon">🔢</span>
+              <span class="mt-label">Format errors</span>
+            </span>
           </label>
-          <label class="check-item">
-            <input type="checkbox" checked id="chkDuplicate" />
-            <span>Duplicate entries</span>
+          <label class="module-toggle">
+            <input type="checkbox" checked id="chkDuplicate"/>
+            <span class="mt-box">
+              <span class="mt-icon">🔁</span>
+              <span class="mt-label">Duplicates</span>
+            </span>
           </label>
-          <label class="check-item">
-            <input type="checkbox" checked id="chkRange" />
-            <span>Impossible values</span>
+          <label class="module-toggle">
+            <input type="checkbox" checked id="chkRange"/>
+            <span class="mt-box">
+              <span class="mt-icon">📊</span>
+              <span class="mt-label">Impossible values</span>
+            </span>
           </label>
-          <label class="check-item">
-            <input type="checkbox" checked id="chkTamper" />
-            <span>Tampered text</span>
+          <label class="module-toggle">
+            <input type="checkbox" checked id="chkTamper"/>
+            <span class="mt-box">
+              <span class="mt-icon">🔍</span>
+              <span class="mt-label">Tampering</span>
+            </span>
           </label>
-          <label class="check-item">
-            <input type="checkbox" id="chkSignature" />
-            <span>Signature check</span>
+          <label class="module-toggle">
+            <input type="checkbox" id="chkBlur"/>
+            <span class="mt-box">
+              <span class="mt-icon">🌫</span>
+              <span class="mt-label">Blur analysis</span>
+            </span>
           </label>
         </div>
       </div>
 
-      <button class="btn btn-primary btn-full" id="scanBtn" disabled>
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-          <path d="M2 5H16M2 9h12M2 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          <circle cx="14" cy="13" r="3" stroke="currentColor" stroke-width="1.5"/>
-          <path d="M13 13h2M14 12v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-        </svg>
-        Scan document
+      <button class="scan-btn" id="scanBtn" disabled>
+        <span class="scan-btn-inner">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 5h16M1 9h12M1 13h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="14" cy="13" r="3.5" stroke="currentColor" stroke-width="1.4"/><path d="M13 13h2M14 12v2" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+          <span id="scanBtnLabel">Scan document</span>
+        </span>
+        <span class="scan-btn-glow"></span>
       </button>
 
-      <p class="disclaimer">
-        Documents are processed locally in this demo. No data is sent to any server.
+      <p class="privacy-line">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L2 3v3c0 2.5 1.7 4.7 4 5.4C8.3 10.7 10 8.5 10 6V3L6 1z" stroke="currentColor" stroke-width="1.2"/></svg>
+        Processed in your browser — no data leaves your device
       </p>
+    </div>
 
-    </section>
+    <div class="col-right" id="colRight">
 
-    <section class="panel panel-right" id="resultsPanel">
-
-      <div class="empty-state" id="emptyState">
-        <div class="empty-icon">
-          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-            <rect x="10" y="6" width="28" height="38" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.3"/>
-            <rect x="16" y="12" width="28" height="38" rx="4" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
-            <rect x="22" y="18" width="18" height="4" rx="2" fill="currentColor" opacity="0.15"/>
-            <rect x="22" y="26" width="14" height="4" rx="2" fill="currentColor" opacity="0.15"/>
-            <rect x="22" y="34" width="10" height="4" rx="2" fill="currentColor" opacity="0.15"/>
-            <circle cx="40" cy="40" r="10" fill="var(--surface-bg)" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
-            <path d="M36 40h8M40 36v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-          </svg>
+      <div class="state-empty" id="stateEmpty">
+        <div class="se-visual">
+          <div class="se-doc">
+            <div class="se-lines">
+              <div class="se-line" style="width:70%"></div>
+              <div class="se-line" style="width:50%"></div>
+              <div class="se-line" style="width:85%"></div>
+              <div class="se-line" style="width:40%"></div>
+            </div>
+            <div class="se-pulse"></div>
+          </div>
         </div>
-        <h3 class="empty-title">No document scanned yet</h3>
-        <p class="empty-body">Upload a document and run a scan to see the extracted text, anomaly report, and risk score.</p>
+        <h3>Ready to analyse</h3>
+        <p>Upload a document and click Scan — your full anomaly report will appear here.</p>
       </div>
 
-      <div class="loading-state hidden" id="loadingState">
-        <div class="loading-bar-wrap">
-          <div class="loading-bar" id="loadingBar"></div>
+      <div class="state-loading hidden" id="stateLoading">
+        <div class="sl-scanner">
+          <div class="sl-doc">
+            <div class="sl-beam" id="slBeam"></div>
+            <div class="sl-lines">
+              <div class="sl-line"></div>
+              <div class="sl-line" style="width:70%"></div>
+              <div class="sl-line" style="width:90%"></div>
+              <div class="sl-line" style="width:55%"></div>
+              <div class="sl-line" style="width:80%"></div>
+              <div class="sl-line" style="width:65%"></div>
+            </div>
+          </div>
         </div>
-        <div class="loading-steps" id="loadingSteps">
-          <p class="loading-step active" data-step="0">Preprocessing image...</p>
-          <p class="loading-step" data-step="1">Running OCR extraction...</p>
-          <p class="loading-step" data-step="2">Validating fields...</p>
-          <p class="loading-step" data-step="3">Running anomaly detection...</p>
-          <p class="loading-step" data-step="4">Generating risk score...</p>
+        <div class="sl-steps" id="slSteps">
+          <div class="sl-step" data-i="0"><span class="ss-dot"></span><span class="ss-text">Preprocessing image</span><span class="ss-tick"></span></div>
+          <div class="sl-step" data-i="1"><span class="ss-dot"></span><span class="ss-text">Running blur detection</span><span class="ss-tick"></span></div>
+          <div class="sl-step" data-i="2"><span class="ss-dot"></span><span class="ss-text">Extracting text via OCR</span><span class="ss-tick"></span></div>
+          <div class="sl-step" data-i="3"><span class="ss-dot"></span><span class="ss-text">Validating fields & formats</span><span class="ss-tick"></span></div>
+          <div class="sl-step" data-i="4"><span class="ss-dot"></span><span class="ss-text">Detecting anomalies</span><span class="ss-tick"></span></div>
+          <div class="sl-step" data-i="5"><span class="ss-dot"></span><span class="ss-text">Generating risk score</span><span class="ss-tick"></span></div>
         </div>
+        <div class="sl-bar-wrap"><div class="sl-bar" id="slBar"></div></div>
+        <p class="sl-status" id="slStatus">Initialising...</p>
       </div>
 
-      <div class="results hidden" id="results">
+      <div class="state-results hidden" id="stateResults">
 
         <div class="risk-card" id="riskCard">
-          <div class="risk-left">
-            <p class="risk-label">Risk score</p>
-            <p class="risk-score" id="riskScore">—</p>
-            <p class="risk-status" id="riskStatus">—</p>
+          <div class="rc-left">
+            <p class="rc-eyebrow">Risk assessment</p>
+            <p class="rc-score" id="rcScore">—</p>
+            <p class="rc-label" id="rcLabel">—</p>
           </div>
-          <div class="risk-ring-wrap">
-            <svg class="risk-ring" viewBox="0 0 100 100" width="90" height="90">
-              <circle class="risk-ring-bg" cx="50" cy="50" r="40" />
-              <circle class="risk-ring-fill" cx="50" cy="50" r="40" id="riskRingFill" />
+          <div class="rc-gauge-wrap">
+            <svg class="rc-gauge" viewBox="0 0 100 100">
+              <circle class="rcg-bg" cx="50" cy="50" r="38"/>
+              <circle class="rcg-fill" cx="50" cy="50" r="38" id="rcgFill"/>
             </svg>
-            <span class="risk-ring-pct" id="riskRingPct">0%</span>
+            <span class="rc-pct" id="rcPct">0%</span>
+          </div>
+          <div class="rc-meta" id="rcMeta">
+            <div class="rcm-item"><span>File</span><strong id="rcFile">—</strong></div>
+            <div class="rcm-item"><span>Type</span><strong id="rcType">—</strong></div>
+            <div class="rcm-item"><span>Anomalies</span><strong id="rcCount">—</strong></div>
+            <div class="rcm-item"><span>Blur</span><strong id="rcBlur">—</strong></div>
           </div>
         </div>
 
-        <div class="result-section">
-          <div class="result-section-header">
-            <h3 class="result-section-title">Anomalies detected</h3>
-            <span class="badge badge-danger" id="anomalyCount">0</span>
+        <div class="result-tabs">
+          <button class="rt active" data-tab="anomalies">
+            Anomalies <span class="rt-badge" id="rtBadge">0</span>
+          </button>
+          <button class="rt" data-tab="text">Extracted text</button>
+          <button class="rt" data-tab="ai">AI summary</button>
+          <button class="rt" data-tab="summary">Summary</button>
+        </div>
+
+        <div class="tab-pane active" id="tp-anomalies">
+          <div class="anomaly-list" id="anomalyList"></div>
+        </div>
+
+        <div class="tab-pane hidden" id="tp-text">
+          <div class="text-toolbar">
+            <span class="tt-label">Raw OCR output</span>
+            <div class="tt-actions">
+              <button class="tt-btn" id="copyOcrBtn">
+                <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="3" y="1" width="8" height="9" rx="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M1 4v7a1 1 0 001 1h6" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>
+                Copy
+              </button>
+            </div>
           </div>
-          <div class="anomaly-list" id="anomalyList">
+          <pre class="ocr-pre" id="ocrPre"></pre>
+        </div>
+
+        <div class="tab-pane hidden" id="tp-ai">
+          <div class="ai-summary-wrap" id="aiSummaryWrap">
+            <div class="ai-loading" id="aiLoading">
+              <div class="ai-spinner"></div>
+              <p>Claude is reading the document...</p>
+            </div>
+            <div class="ai-result hidden" id="aiResult">
+              <div class="ai-badge">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1l1.8 3.6 4 .6-2.9 2.8.7 4L7 10.1 3.4 12l.7-4L1.2 5.2l4-.6L7 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+                AI Analysis by Claude
+              </div>
+              <p class="ai-text" id="aiText"></p>
+            </div>
           </div>
         </div>
 
-        <div class="result-section">
-          <div class="result-section-header">
-            <h3 class="result-section-title">Extracted text</h3>
-            <button class="btn-copy" id="copyText" title="Copy extracted text">
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-                <rect x="4" y="1" width="9" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/>
-                <path d="M2 4v9a2 2 0 002 2h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-              </svg>
-              Copy
-            </button>
-          </div>
-          <pre class="extracted-text" id="extractedText"></pre>
+        <div class="tab-pane hidden" id="tp-summary">
+          <div class="summary-grid" id="summaryGrid"></div>
         </div>
 
-        <div class="action-row">
-          <button class="btn btn-outline" id="downloadReport">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M2 12h12" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-            </svg>
+        <div class="result-actions">
+          <button class="ra-btn" id="downloadBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2v7M4 6.5L7 9.5l3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 11h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
             Download report
           </button>
-          <button class="btn btn-outline" id="rescan">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 8a6 6 0 0110.5-4M14 8a6 6 0 01-10.5 4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-              <path d="M12 4l.5-2.5 2.5.5M4 12l-.5 2.5-2.5-.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            Scan again
+          <button class="ra-btn" id="newScanBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7a5 5 0 009.5-2M12 7a5 5 0 01-9.5 2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M11 5l1-2.5 2.5 1M3 9l-1 2.5-2.5-1" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            New scan
+          </button>
+          <button class="ra-btn ra-btn-share" id="shareBtn">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="11" cy="3" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="11" cy="11" r="1.5" stroke="currentColor" stroke-width="1.2"/><circle cx="3" cy="7" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 6.2l5-2.5M4.5 7.8l5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Share
           </button>
         </div>
 
       </div>
+    </div>
+  </div>
+</section>
 
-    </section>
-  </main>
-
-  <section class="how-section" id="how-it-works">
-    <div class="how-inner">
-      <p class="section-eyebrow">Process</p>
-      <h2 class="section-title">How ScanSentinel works</h2>
-      <div class="steps-row">
-        <div class="step">
-          <div class="step-num">01</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <rect x="4" y="4" width="20" height="20" rx="4" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M10 14l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3 class="step-title">Upload</h3>
-          <p class="step-body">Drop in a scanned image or PDF — printed or handwritten.</p>
+<section class="how-section" id="how">
+  <div class="how-inner">
+    <p class="s-eyebrow" data-aos>Process</p>
+    <h2 class="s-title" data-aos data-aos-delay="60">Four steps. Total clarity.</h2>
+    <div class="how-grid">
+      <div class="how-card" data-aos data-aos-delay="0">
+        <div class="hc-num">01</div>
+        <div class="hc-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M4 4h15l5 5v15a2 2 0 01-2 2H4a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="currentColor" stroke-width="1.4"/><path d="M19 4v5h5" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 13h7M8 17h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
         </div>
-        <div class="step-arrow">→</div>
-        <div class="step">
-          <div class="step-num">02</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <rect x="4" y="6" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M8 12h12M8 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3 class="step-title">Extract</h3>
-          <p class="step-body">OCR &amp; ICR pulls every character out of the document.</p>
+        <h3>Upload</h3>
+        <p>Drop any scanned image or PDF. Printed, handwritten, or blurred — all accepted.</p>
+      </div>
+      <div class="how-card" data-aos data-aos-delay="100">
+        <div class="hc-num">02</div>
+        <div class="hc-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="4" y="8" width="20" height="12" rx="3" stroke="currentColor" stroke-width="1.4"/><path d="M8 14h12M8 18h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4 11h20" stroke="currentColor" stroke-width="1.4" opacity="0.3"/></svg>
         </div>
-        <div class="step-arrow">→</div>
-        <div class="step">
-          <div class="step-num">03</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <circle cx="14" cy="14" r="9" stroke="currentColor" stroke-width="1.5"/>
-              <path d="M14 10v5l3 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3 class="step-title">Validate</h3>
-          <p class="step-body">Rules engine checks formats, ranges, and required fields.</p>
+        <h3>Extract</h3>
+        <p>OCR pulls every character. Blur detection measures sharpness and warns if quality is too low.</p>
+      </div>
+      <div class="how-card" data-aos data-aos-delay="200">
+        <div class="hc-num">03</div>
+        <div class="hc-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="9" stroke="currentColor" stroke-width="1.4"/><path d="M10 14l3 3 5-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="step-arrow">→</div>
-        <div class="step">
-          <div class="step-num">04</div>
-          <div class="step-icon">
-            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-              <path d="M6 22L14 6l8 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M9 17h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3 class="step-title">Report</h3>
-          <p class="step-body">Get a detailed anomaly list and risk score to act on.</p>
+        <h3>Validate</h3>
+        <p>Rules engine checks formats, ranges, required fields, duplicates, and suspicious patterns.</p>
+      </div>
+      <div class="how-card" data-aos data-aos-delay="300">
+        <div class="hc-num">04</div>
+        <div class="hc-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M14 4L4 24h20L14 4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M14 12v6M14 21v1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
         </div>
+        <h3>Report</h3>
+        <p>Get a ranked anomaly list, AI summary, risk score gauge, and a downloadable report.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <footer class="footer">
-    <p>ScanSentinel &copy; 2025 &mdash; Built by <a href="https://github.com/jagadeesh2k07" target="_blank">jagadeesh2k07</a></p>
-  </footer>
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-name">ScanSentinel</span>
+      <span class="footer-tagline">AI document anomaly detection</span>
+    </div>
+    <p class="footer-copy">Built by <a href="https://github.com/jagadeesh2k07" target="_blank">jagadeesh2k07</a> · SIH 2025</p>
+  </div>
+</footer>
 
-  <script src="script.js"></script>
+<div class="toast-host" id="toastHost"></div>
+
+<script src="script.js"></script>
 </body>
 </html>
