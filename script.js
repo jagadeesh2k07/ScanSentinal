@@ -484,6 +484,7 @@ Phone       : 98765
 Email       : suresh@@gmail.com
 Aadhaar No  : 1234 5678 9012
 Address     : [BLANK]
+Address     : [BLANK]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Signature   : ✓ Present`,
     anomalies: [
@@ -573,22 +574,24 @@ async function callScanAPI(file, docTypeVal) {
   const data = await response.json();
 
   return {
-    text:      data.text       || '',
+    text: data.ocrText || "",
+
     anomalies: (data.anomalies || []).map(a => ({
-      type:   a.type     || 'Unknown',
-      detail: a.detail   || '',
-      sev:    a.severity || 'medium',
+        type: a.title || "Unknown",
+        detail: a.description || "",
+        sev: (a.severity || "medium").toLowerCase()
     })),
-    risk:      Math.min(Math.max(Number(data.risk) || 0, 0), 100),
-    docType:   docTypeVal,
-    fileName:  file.name,
-    fileSize:  formatBytes(file.size),
-    blurPct:   blurResult?.pct   || 0,
-    blurLabel: blurResult?.label || 'N/A',
-    scannedAt: new Date().toLocaleString('en-IN'),
-    aiSummary: data.summary      || '',
-    fromAPI:   true,
-  };
+    risk: Number(data.risk) || 0,
+    confidence: Number(data.confidence) || 0,
+    docType: data.documentType || docTypeVal,
+    fileName: file.name,
+    fileSize: formatBytes(file.size),
+    blurPct: blurResult?.pct || 0,
+    blurLabel: blurResult?.label || "N/A",
+    scannedAt: new Date().toLocaleString("en-IN"),
+    aiSummary: data.summary || "",
+    fromAPI: true
+};
 }
 
 function fileToBase64(file) {
@@ -612,16 +615,17 @@ function buildScanResult(file, type) {
   risk = Math.min(risk, 99);
 
   return {
-    text:       doc.text,
-    anomalies:  doc.anomalies,
-    risk,
-    docType:    type,
-    fileName:   file.name,
-    fileSize:   formatBytes(file.size),
-    blurPct:    blurResult?.pct || 0,
-    blurLabel:  blurResult?.label || 'N/A',
-    scannedAt:  new Date().toLocaleString('en-IN'),
-  };
+  text:       doc.text,
+  anomalies:  doc.anomalies,
+  risk,
+  confidence: 100,   // local rule-engine results are deterministic
+  docType:    type,
+  fileName:   file.name,
+  fileSize:   formatBytes(file.size),
+  blurPct:    blurResult?.pct || 0,
+  blurLabel:  blurResult?.label || 'N/A',
+  scannedAt:  new Date().toLocaleString('en-IN'),
+};
 }
 
 
@@ -635,7 +639,7 @@ function renderResults(data) {
   animNum(rcScore, 0, pct, 1100, v => v + '%');
   rcLabel.textContent = riskVerdict(pct);
   rcFile.textContent  = data.fileName.length > 18 ? data.fileName.slice(0, 16) + '…' : data.fileName;
-  rcType.textContent  = data.docType;
+  rcType.textContent = `${data.docType} (${data.confidence}% confidence)`;
   rcCount.textContent = data.anomalies.length;
   rcBlur.textContent  = data.blurLabel;
 
@@ -671,13 +675,46 @@ function renderResults(data) {
   const high = data.anomalies.filter(a => a.sev === 'high').length;
   const med  = data.anomalies.filter(a => a.sev === 'medium').length;
   summaryGrid.innerHTML = `
-    <div class="sg-item"><span class="sg-label">File</span><span class="sg-value" style="font-size:13px;word-break:break-all">${esc(data.fileName)}</span></div>
-    <div class="sg-item"><span class="sg-label">Risk Score</span><span class="sg-value" style="color:${col}">${pct}%</span></div>
-    <div class="sg-item"><span class="sg-label">High Severity</span><span class="sg-value" style="color:var(--danger)">${high}</span></div>
-    <div class="sg-item"><span class="sg-label">Medium Severity</span><span class="sg-value" style="color:var(--warn)">${med}</span></div>
-    <div class="sg-item"><span class="sg-label">Blur Level</span><span class="sg-value" style="font-size:14px">${data.blurLabel}</span></div>
-    <div class="sg-item"><span class="sg-label">Scanned At</span><span class="sg-value" style="font-size:12px;color:var(--text2)">${esc(data.scannedAt)}</span></div>
-  `;
+<div class="sg-item">
+<span class="sg-label">File</span>
+<span class="sg-value" style="font-size:13px;word-break:break-all">${esc(data.fileName)}</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">Document</span>
+<span class="sg-value">${esc(data.docType)}</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">Confidence</span>
+<span class="sg-value">${data.confidence}%</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">Risk Score</span>
+<span class="sg-value" style="color:${col}">${pct}%</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">High Severity</span>
+<span class="sg-value" style="color:var(--danger)">${high}</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">Medium Severity</span>
+<span class="sg-value" style="color:var(--warn)">${med}</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">Blur</span>
+<span class="sg-value">${data.blurLabel}</span>
+</div>
+
+<div class="sg-item">
+<span class="sg-label">Scanned At</span>
+<span class="sg-value">${esc(data.scannedAt)}</span>
+</div>
+`;
 
   aiLoading.classList.remove('hidden');
   aiResult.classList.add('hidden');
@@ -880,7 +917,7 @@ function riskColor(p) {
 }
 
 function riskGrad(p) {
-  if (p >= 65) return 'linear-gradient(90deg,var(--warn),var(--danger))';
+  if (p >= 65) return 'linear-gradient(90deg,var(--warn),var(--danger))'; 
   if (p >= 35) return 'linear-gradient(90deg,var(--success),var(--warn))';
   return 'linear-gradient(90deg,var(--cyan),var(--success))';
 }
