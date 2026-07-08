@@ -56,27 +56,23 @@ Return ONLY valid JSON.
     {
       "severity": "high | medium | low",
       "title": "",
-      "description": ""
+      "description": "",
+      "category": "missing | format | duplicate | range | tamper | blur"
     }
   ],
   "summary": ""
 }
 
 Instructions:
-
-- Extract ALL readable text.
-- Preserve line breaks.
+- Extract ALL readable text, preserving line breaks.
 - Identify document type.
-- Detect invalid dates.
-- Detect invalid phone numbers.
-- Detect invalid email addresses.
-- Detect duplicate IDs.
-- Detect impossible values.
-- Detect missing mandatory fields.
-- Detect suspicious edits if visible.
+${enabledModules?.missing   !== false ? '- Detect missing mandatory fields (category: "missing").' : ''}
+${enabledModules?.format    !== false ? '- Detect invalid dates, phone numbers, emails (category: "format").' : ''}
+${enabledModules?.duplicate !== false ? '- Detect duplicate IDs (category: "duplicate").' : ''}
+${enabledModules?.range     !== false ? '- Detect impossible or out-of-range values (category: "range").' : ''}
+${enabledModules?.tamper    !== false ? '- Detect suspicious edits or tampering if visible (category: "tamper").' : ''}
 - If text is blurred, infer only when highly confident.
-- Confidence is from 0 to 100.
-- Risk is from 0 to 100.
+- Confidence is from 0 to 100. Risk is from 0 to 100.
 - Return ONLY JSON.
 `;
 
