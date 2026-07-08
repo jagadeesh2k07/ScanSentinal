@@ -1,4 +1,3 @@
-
 (function initAmbient() {
   const canvas = document.getElementById('ambientCanvas');
   const ctx    = canvas.getContext('2d');
@@ -96,7 +95,7 @@ function computeBlurScore(imageFile) {
     const img = new Image();
     const url = URL.createObjectURL(imageFile);
     img.onload = () => {
-      const MAX = 200;
+      const MAX = 600;
       const scale = Math.min(MAX / img.width, MAX / img.height, 1);
       const W = Math.round(img.width  * scale);
       const H = Math.round(img.height * scale);
@@ -127,7 +126,9 @@ function computeBlurScore(imageFile) {
       const variance = count > 0 ? sumSq / count : 0;
       URL.revokeObjectURL(url);
 
-      const SHARP_THRESH = 120;
+      console.log('[ScanSentinel] Laplacian variance:', variance.toFixed(2), 'for', imageFile.name);
+
+      const SHARP_THRESH = 400;
       const blurPct = Math.round(Math.max(0, Math.min(100, (1 - Math.min(variance, SHARP_THRESH) / SHARP_THRESH) * 100)));
 
       let level, label;
@@ -484,7 +485,6 @@ Phone       : 98765
 Email       : suresh@@gmail.com
 Aadhaar No  : 1234 5678 9012
 Address     : [BLANK]
-Address     : [BLANK]
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Signature   : ✓ Present`,
     anomalies: [
@@ -591,7 +591,7 @@ async function callScanAPI(file, docTypeVal) {
     scannedAt: new Date().toLocaleString("en-IN"),
     aiSummary: data.summary || "",
     fromAPI: true
-};
+  };
 }
 
 function fileToBase64(file) {
@@ -615,17 +615,17 @@ function buildScanResult(file, type) {
   risk = Math.min(risk, 99);
 
   return {
-  text:       doc.text,
-  anomalies:  doc.anomalies,
-  risk,
-  confidence: 100,   // local rule-engine results are deterministic
-  docType:    type,
-  fileName:   file.name,
-  fileSize:   formatBytes(file.size),
-  blurPct:    blurResult?.pct || 0,
-  blurLabel:  blurResult?.label || 'N/A',
-  scannedAt:  new Date().toLocaleString('en-IN'),
-};
+    text:       doc.text,
+    anomalies:  doc.anomalies,
+    risk,
+    confidence: 100,
+    docType:    type,
+    fileName:   file.name,
+    fileSize:   formatBytes(file.size),
+    blurPct:    blurResult?.pct || 0,
+    blurLabel:  blurResult?.label || 'N/A',
+    scannedAt:  new Date().toLocaleString('en-IN'),
+  };
 }
 
 
