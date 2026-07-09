@@ -554,7 +554,7 @@ async function callScanAPI(file, docTypeVal) {
 
   const payload = {
     image:        base64,
-    mediaType:    file.type === 'application/pdf' ? 'image/jpeg' : file.type,
+    mediaType:    file.type,
     documentType: docTypeVal,
     fileName:     file.name,
     blurPct:      blurResult?.pct || 0,
